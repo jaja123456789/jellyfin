@@ -14,6 +14,7 @@ public class EncodingOptions
     public EncodingOptions()
     {
         EnableFallbackFont = false;
+        FallbackFontPath = "/jellyfin/jellyfin-web/assets/fonts";
         EnableAudioVbr = false;
         DownMixAudioBoost = 2;
         DownMixStereoAlgorithm = DownMixStereoAlgorithms.None;

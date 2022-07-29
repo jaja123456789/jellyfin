@@ -815,6 +815,11 @@ namespace MediaBrowser.MediaEncoding.Encoder
                     {
                         return true;
                     }
+                    result = videoStream.PixelFormat.Contains("p12", StringComparison.OrdinalIgnoreCase);
+                    if (result)
+                    {
+                        return true;
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(videoStream.Profile))
@@ -828,7 +833,7 @@ namespace MediaBrowser.MediaEncoding.Encoder
                     }
                 }
 
-                result = (videoStream.BitDepth ?? 8) == 10;
+                result = (videoStream.BitDepth ?? 8) != 8;
                 if (result)
                 {
                     return true;

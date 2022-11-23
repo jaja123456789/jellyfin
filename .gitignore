@@ -279,3 +279,5 @@ apiclient/generated
 mono_crash.*.json
 
 /realtek
+/common
+/rockchip

@@ -36,24 +36,28 @@ RUN apt-get update \
  && wget -O - https://repo.jellyfin.org/jellyfin_team.gpg.key | apt-key add - \
  && echo "deb [arch=$( dpkg --print-architecture )] https://repo.jellyfin.org/$( awk -F'=' '/^ID=/{ print $NF }' /etc/os-release ) $( awk -F'=' '/^VERSION_CODENAME=/{ print $NF }' /etc/os-release ) main" | tee /etc/apt/sources.list.d/jellyfin.list \
  && apt-get update \
+ && if [ "$TARGETARCH" != "arm64" ]; then \
+    apt-get install --no-install-recommends --no-install-suggests -y mesa-va-drivers; \
+   fi; \
  && apt-get install --no-install-recommends --no-install-suggests -y \
-   mesa-va-drivers \
    jellyfin-ffmpeg5 \
    openssl \
    locales \
 # Intel VAAPI Tone mapping dependencies:
 # Prefer NEO to Beignet since the latter one doesn't support Comet Lake or newer for now.
 # Do not use the intel-opencl-icd package from repo since they will not build with RELEASE_WITH_REGKEYS enabled.
- && mkdir intel-compute-runtime \
- && cd intel-compute-runtime \
- && wget https://github.com/intel/compute-runtime/releases/download/${NEO_VERSION}/intel-gmmlib_${GMMLIB_VERSION}_amd64.deb \
- && wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-${IGC_VERSION}/intel-igc-core_${IGC_VERSION}_amd64.deb \
- && wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-${IGC_VERSION}/intel-igc-opencl_${IGC_VERSION}_amd64.deb \
- && wget https://github.com/intel/compute-runtime/releases/download/${NEO_VERSION}/intel-opencl-icd_${NEO_VERSION}_amd64.deb \
- && wget https://github.com/intel/compute-runtime/releases/download/${NEO_VERSION}/intel-level-zero-gpu_${LEVEL_ZERO_VERSION}_amd64.deb \
- && dpkg -i *.deb \
- && cd .. \
- && rm -rf intel-compute-runtime \
+ && if [ "$TARGETARCH" != "arm64" ]; then \
+   mkdir intel-compute-runtime \
+   && cd intel-compute-runtime \
+   && wget https://github.com/intel/compute-runtime/releases/download/${NEO_VERSION}/intel-gmmlib_${GMMLIB_VERSION}_amd64.deb \
+   && wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-${IGC_VERSION}/intel-igc-core_${IGC_VERSION}_amd64.deb \
+   && wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-${IGC_VERSION}/intel-igc-opencl_${IGC_VERSION}_amd64.deb \
+   && wget https://github.com/intel/compute-runtime/releases/download/${NEO_VERSION}/intel-opencl-icd_${NEO_VERSION}_amd64.deb \
+   && wget https://github.com/intel/compute-runtime/releases/download/${NEO_VERSION}/intel-level-zero-gpu_${LEVEL_ZERO_VERSION}_amd64.deb \
+   && dpkg -i *.deb \
+   && cd .. \
+   && rm -rf intel-compute-runtime \
+ fi; \
  && apt-get remove gnupg wget -y \
  && apt-get clean autoclean -y \
  && apt-get autoremove -y \

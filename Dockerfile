@@ -38,7 +38,7 @@ RUN apt-get update \
  && apt-get update \
  && if [ "$TARGETARCH" != "arm64" ]; then \
     apt-get install --no-install-recommends --no-install-suggests -y mesa-va-drivers; \
-   fi; \
+   fi \
  && apt-get install --no-install-recommends --no-install-suggests -y \
    jellyfin-ffmpeg5 \
    openssl \
@@ -47,17 +47,17 @@ RUN apt-get update \
 # Prefer NEO to Beignet since the latter one doesn't support Comet Lake or newer for now.
 # Do not use the intel-opencl-icd package from repo since they will not build with RELEASE_WITH_REGKEYS enabled.
  && if [ "$TARGETARCH" != "arm64" ]; then \
-   mkdir intel-compute-runtime; \
-   cd intel-compute-runtime; \
-   wget https://github.com/intel/compute-runtime/releases/download/${NEO_VERSION}/intel-gmmlib_${GMMLIB_VERSION}_amd64.deb; \
-   wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-${IGC_VERSION}/intel-igc-core_${IGC_VERSION}_amd64.deb; \
-   wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-${IGC_VERSION}/intel-igc-opencl_${IGC_VERSION}_amd64.deb; \
-   wget https://github.com/intel/compute-runtime/releases/download/${NEO_VERSION}/intel-opencl-icd_${NEO_VERSION}_amd64.deb; \
-   wget https://github.com/intel/compute-runtime/releases/download/${NEO_VERSION}/intel-level-zero-gpu_${LEVEL_ZERO_VERSION}_amd64.deb; \
-   dpkg -i *.deb; \
-   cd ..; \
-   rm -rf intel-compute-runtime \
- fi; \
+   mkdir intel-compute-runtime \
+   && cd intel-compute-runtime \
+   && wget https://github.com/intel/compute-runtime/releases/download/${NEO_VERSION}/intel-gmmlib_${GMMLIB_VERSION}_amd64.deb \
+   && wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-${IGC_VERSION}/intel-igc-core_${IGC_VERSION}_amd64.deb \
+   && wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-${IGC_VERSION}/intel-igc-opencl_${IGC_VERSION}_amd64.deb \
+   && wget https://github.com/intel/compute-runtime/releases/download/${NEO_VERSION}/intel-opencl-icd_${NEO_VERSION}_amd64.deb \
+   && wget https://github.com/intel/compute-runtime/releases/download/${NEO_VERSION}/intel-level-zero-gpu_${LEVEL_ZERO_VERSION}_amd64.deb \
+   && dpkg -i *.deb \
+   && cd .. \
+   && rm -rf intel-compute-runtime; \
+ fi \
  && apt-get remove gnupg wget -y \
  && apt-get clean autoclean -y \
  && apt-get autoremove -y \

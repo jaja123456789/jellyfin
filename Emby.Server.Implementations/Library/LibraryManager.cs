@@ -697,7 +697,10 @@ namespace Emby.Server.Implementations.Library
                 }
                 catch (System.IO.IOException)
                 {
-                    throw;
+                    if (parent.IsRoot)
+                    {
+                        throw;
+                    }
                 }
                 catch (Exception ex)
                 {

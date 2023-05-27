@@ -17,9 +17,9 @@ jobs:
       matrix:
         include:
           - dockerfile: ./Dockerfile
-            image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            image: ghcr.io/jaja123456789/jellyfin
           - dockerfile: ./Dockerfile.arm64
-            image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-arm64:latest
+            image: ghcr.io/jaja123456789/jellyfin-arm64
     permissions:
       contents: read
       packages: write

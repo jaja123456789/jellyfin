@@ -109,6 +109,7 @@ namespace Jellyfin.Server
                 .AddDbContextCheck<JellyfinDb>()
                 .AddCheck<TasksHealthCheck>(nameof(TaskManager));
 
+
             services.AddHlsPlaylistGenerator();
         }
 

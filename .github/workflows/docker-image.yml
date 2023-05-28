@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master" , "release-10.8.z"]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master" , "release-10.8.z"]
 
 jobs:
   build-and-push-amd64-image:
@@ -35,6 +35,9 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value={{sha}},enable=${{ github.ref_type != 'tag' }}
+          flavor: |
+            latest=auto
+            suffix=-amd64,onlatest=true
 
       - name: Build and push Docker image Drill4Net.Agent.Service
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
@@ -42,7 +45,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository }}:amd64
+          tags: ghcr.io/${{ steps.meta.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
           
   build:
@@ -82,6 +85,9 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value={{sha}},enable=${{ github.ref_type != 'tag' }}
+          flavor: |
+            latest=auto
+            suffix=-arm64,onlatest=true
           
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
@@ -91,5 +97,5 @@ jobs:
           push: true
           provenance: false
           platforms: linux/arm64
-          tags: ghcr.io/${{ github.repository }}:arm64
+          tags: ghcr.io/${{ steps.meta.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}

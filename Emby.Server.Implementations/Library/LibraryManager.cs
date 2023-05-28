@@ -586,6 +586,11 @@ namespace Emby.Server.Implementations.Library
                 {
                     files = FileData.GetFilteredFileSystemEntries(directoryService, args.Path, _fileSystem, _appHost, _logger, args, flattenFolderDepth: flattenFolderDepth, resolveShortcuts: isPhysicalRoot || isVf);
                 }
+                catch (System.IO.IOException ex)
+                {
+                    _logger.LogError(ex, "IO error in GetFilteredFileSystemEntries Path:{0}", args.Path);
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     if (parent != null && parent.IsPhysicalRoot)
@@ -711,6 +716,13 @@ namespace Emby.Server.Implementations.Library
                 try
                 {
                     result = ResolvePath(file, directoryService, resolvers, parent, collectionType, libraryOptions);
+                }
+                catch (System.IO.IOException)
+                {
+                    if (parent.IsRoot)
+                    {
+                        throw;
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -4,9 +4,11 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
+using Emby.Server.Implementations.ScheduledTasks;
 using Jellyfin.MediaEncoding.Hls.Extensions;
 using Jellyfin.Networking.Configuration;
 using Jellyfin.Server.Extensions;
+using Jellyfin.Server.HealthChecks;
 using Jellyfin.Server.Implementations;
 using Jellyfin.Server.Infrastructure;
 using Jellyfin.Server.Middleware;
@@ -104,7 +106,8 @@ namespace Jellyfin.Server
                 .ConfigurePrimaryHttpMessageHandler(defaultHttpClientHandlerDelegate);
 
             services.AddHealthChecks()
-                .AddDbContextCheck<JellyfinDb>();
+                .AddDbContextCheck<JellyfinDb>()
+                .AddCheck<TasksHealthCheck>(nameof(TaskManager));
 
             services.AddHlsPlaylistGenerator();
         }

@@ -27,14 +27,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Docker metadata
-        id: metadata
+        id: meta
         uses: docker/metadata-action@v3
         with:
           images: ${{ env.IMG_NAME }}
           tags: |
+            type=ref,event=branch
+            type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=raw,value={{sha}},enable=${{ github.ref_type != 'tag' }}
           flavor: |
             latest=auto
             suffix=-amd64,onlatest=true
@@ -46,7 +47,7 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ghcr.io/${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.metadata.outputs.labels }}
+          labels: ${{ steps.meta.outputs.labels }}
           
   build:
     name: build-and-push-arm64-image
@@ -77,14 +78,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Docker metadata
-        id: metadata
+        id: meta
         uses: docker/metadata-action@v3
         with:
           images: ${{ env.IMG_NAME }}
           tags: |
+            type=ref,event=branch
+            type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=raw,value={{sha}},enable=${{ github.ref_type != 'tag' }}
           flavor: |
             latest=auto
             suffix=-arm64,onlatest=true
@@ -98,4 +100,4 @@ jobs:
           provenance: false
           platforms: linux/arm64
           tags: ghcr.io/${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.metadata.outputs.labels }}
+          labels: ${{ steps.meta.outputs.labels }}

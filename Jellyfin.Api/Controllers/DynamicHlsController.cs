@@ -508,6 +508,11 @@ public class DynamicHlsController : BaseJellyfinApiController
             EnableTrickplay = enableTrickplay
         };
 
+        if (streamingRequest.SubtitleMethod == SubtitleDeliveryMethod.Encode
+            && !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("JELLYFIN_SUB_UNBURN")))
+        {
+            streamingRequest.SubtitleMethod = SubtitleDeliveryMethod.Drop;
+        }
         return await _dynamicHlsHelper.GetMasterHlsPlaylist(TranscodingJobType, streamingRequest, enableAdaptiveBitrateStreaming).ConfigureAwait(false);
     }
 
@@ -840,6 +845,13 @@ public class DynamicHlsController : BaseJellyfinApiController
             Context = context ?? EncodingContext.Streaming,
             StreamOptions = streamOptions
         };
+
+        if (streamingRequest.SubtitleMethod == SubtitleDeliveryMethod.Encode
+            && !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("JELLYFIN_SUB_UNBURN")))
+        {
+            streamingRequest.SubtitleMethod = SubtitleDeliveryMethod.Drop;
+        }
+
 
         return await GetVariantPlaylistInternal(streamingRequest, cancellationTokenSource)
             .ConfigureAwait(false);

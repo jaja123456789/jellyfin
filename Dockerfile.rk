@@ -1,0 +1,18 @@
+
+ARG VERSION
+
+FROM jjm2473/jellyfin-base:$VERSION
+
+ENV JELLYFIN_SUB_UNBURN 1
+
+ENTRYPOINT ["./jellyfin/jellyfin", \
+    "--datadir", "/config", \
+    "--cachedir", "/cache", \
+    "--ffmpeg", "/usr/bin/ffmpeg"]
+
+RUN ln -s /usr/lib/jellyfin-ffmpeg/ffprobe /usr/bin/ffprobe
+
+ADD rkrga.tar.gz /
+ADD rkmpp.tar.gz /
+ADD libffmpeg-full.tar.gz /
+ADD ffmpeg.tar.gz /

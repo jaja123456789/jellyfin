@@ -1,0 +1,10 @@
+
+ARG VERSION
+
+FROM jjm2473/jellyfin-server:$VERSION as app
+
+COPY jellyfin-web /jellyfin/jellyfin-web
+
+# add fonts for ASS/SSA client render
+RUN mkdir -p /jellyfin/jellyfin-web/assets/fonts \
+    && curl -L https://github.com/jjm2473/rtd1296_prebuilt_target/releases/download/v1.0/noto.tar.gz | tar -xz -C /jellyfin/jellyfin-web/assets/fonts

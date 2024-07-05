@@ -513,6 +513,7 @@ public class DynamicHlsController : BaseJellyfinApiController
         {
             streamingRequest.SubtitleMethod = SubtitleDeliveryMethod.Drop;
         }
+
         return await _dynamicHlsHelper.GetMasterHlsPlaylist(TranscodingJobType, streamingRequest, enableAdaptiveBitrateStreaming).ConfigureAwait(false);
     }
 
@@ -851,7 +852,6 @@ public class DynamicHlsController : BaseJellyfinApiController
         {
             streamingRequest.SubtitleMethod = SubtitleDeliveryMethod.Drop;
         }
-
 
         return await GetVariantPlaylistInternal(streamingRequest, cancellationTokenSource)
             .ConfigureAwait(false);

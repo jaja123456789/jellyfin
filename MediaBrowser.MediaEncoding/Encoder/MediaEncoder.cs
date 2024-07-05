@@ -815,6 +815,7 @@ namespace MediaBrowser.MediaEncoding.Encoder
                     {
                         return true;
                     }
+
                     result = videoStream.PixelFormat.Contains("p12", StringComparison.OrdinalIgnoreCase);
                     if (result)
                     {
@@ -843,7 +844,7 @@ namespace MediaBrowser.MediaEncoding.Encoder
             return result;
         }
 
-		/// <inheritdoc />
+        /// <inheritdoc />
         public Task<string> ExtractVideoImagesOnIntervalAccelerated(
             string inputFile,
             string container,
@@ -1052,7 +1053,6 @@ namespace MediaBrowser.MediaEncoding.Encoder
                 return targetDirectory;
             }
         }
-
 
         public string GetTimeParameter(long ticks)
         {

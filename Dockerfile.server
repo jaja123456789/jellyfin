@@ -1,9 +1,9 @@
 
 ARG VERSION
 
-FROM jjm2473/jellyfin-server-build:$VERSION as server
+FROM jaja123456/jellyfin-server-build:$VERSION as server
 
-FROM jjm2473/jellyfin-runtime:v1 as app
+FROM jaja123456/jellyfin-runtime:v1 as app
 
 # ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 ENV LC_ALL en_US.UTF-8

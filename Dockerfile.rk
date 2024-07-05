@@ -1,7 +1,7 @@
 
 ARG VERSION
 
-FROM jjm2473/jellyfin-base:$VERSION
+FROM jaja123456/jellyfin-base:$VERSION
 
 ENV JELLYFIN_SUB_UNBURN 1
 

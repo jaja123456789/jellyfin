@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim as server
+
+ARG DOTNET_ARCH
+
+ARG SOURCE_DIR=/src
+ARG ARTIFACT_DIR=/jellyfin
+
+WORKDIR ${SOURCE_DIR}
+COPY . .
+ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
+
+RUN dotnet publish Jellyfin.Server --configuration Release \
+    --output="${ARTIFACT_DIR}" --self-contained \
+    --runtime linux-arm64 -p:DebugSymbols=false -p:DebugType=none
+

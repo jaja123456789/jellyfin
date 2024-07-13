@@ -1754,7 +1754,7 @@ public class DynamicHlsController : BaseJellyfinApiController
 
         args += _encodingHelper.GetAudioFilterParam(state, _encodingOptions);
 
-        if (audioCodec == "libfdk_aac")
+        if (audioCodec.Contains("aac", StringComparison.InvariantCultureIgnoreCase) && state.OutputContainer == "mp4")
         {
             args += " -bsf:a aac_adtstoasc";
         }

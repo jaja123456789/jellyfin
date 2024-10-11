@@ -193,7 +193,7 @@ namespace MediaBrowser.MediaEncoding.Encoder
 
                 _threads = EncodingHelper.GetNumberOfThreads(null, options, null);
 
-                _isPkeyPauseSupported = validator.CheckSupportedRuntimeKey("p      pause transcoding");
+                _isPkeyPauseSupported = validator.CheckSupportedRuntimeKey("p      pause transcoding", _ffmpegVersion);
 
                 // Check the Vaapi device vendor
                 if (OperatingSystem.IsLinux()
@@ -625,7 +625,7 @@ namespace MediaBrowser.MediaEncoding.Encoder
             {
                 try
                 {
-                    return await ExtractImageInternal(inputArgument, container, videoStream, imageStreamIndex, threedFormat, offset, true, targetFormat, cancellationToken).ConfigureAwait(false);
+                    return await ExtractImageInternal(inputArgument, container, videoStream, imageStreamIndex, threedFormat, offset, true, targetFormat, false, cancellationToken).ConfigureAwait(false);
                 }
                 catch (ArgumentException)
                 {
@@ -637,7 +637,7 @@ namespace MediaBrowser.MediaEncoding.Encoder
                 }
             }
 
-            return await ExtractImageInternal(inputArgument, container, videoStream, imageStreamIndex, threedFormat, offset, false, targetFormat, cancellationToken).ConfigureAwait(false);
+            return await ExtractImageInternal(inputArgument, container, videoStream, imageStreamIndex, threedFormat, offset, false, targetFormat, isAudio, cancellationToken).ConfigureAwait(false);
         }
 
         private string GetImageResolutionParameter()
@@ -663,7 +663,17 @@ namespace MediaBrowser.MediaEncoding.Encoder
             return imageResolutionParameter;
         }
 
-        private async Task<string> ExtractImageInternal(string inputPath, string container, MediaStream videoStream, int? imageStreamIndex, Video3DFormat? threedFormat, TimeSpan? offset, bool useIFrame, ImageFormat? targetFormat, CancellationToken cancellationToken)
+        private async Task<string> ExtractImageInternal(
+            string inputPath,
+            string container,
+            MediaStream videoStream,
+            int? imageStreamIndex,
+            Video3DFormat? threedFormat,
+            TimeSpan? offset,
+            bool useIFrame,
+            ImageFormat? targetFormat,
+            bool isAudio,
+            CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrEmpty(inputPath);
 
@@ -730,7 +740,7 @@ namespace MediaBrowser.MediaEncoding.Encoder
 
             var vf = string.Join(',', filters);
             var mapArg = imageStreamIndex.HasValue ? (" -map 0:" + imageStreamIndex.Value.ToString(CultureInfo.InvariantCulture)) : string.Empty;
-            var args = string.Format(CultureInfo.InvariantCulture, "{6} -i {0}{3} -threads {4} -v quiet -vframes 1 -vf {2}{5} -f image2 \"{1}\"", inputPath, tempExtractPath, vf, mapArg, _threads, GetImageResolutionParameter(), decoder);
+            var args = string.Format(CultureInfo.InvariantCulture, "-i {0}{3} -threads {4} -v quiet -vframes 1 -vf {2}{5} -f image2 \"{1}\"", inputPath, tempExtractPath, vf, mapArg, _threads, isAudio ? string.Empty : GetImageResolutionParameter());
 
             if (offset.HasValue)
             {
@@ -773,7 +783,7 @@ namespace MediaBrowser.MediaEncoding.Encoder
                     var timeoutMs = _configurationManager.Configuration.ImageExtractionTimeoutMs;
                     if (timeoutMs <= 0)
                     {
-                        timeoutMs = (enableHdrExtraction || h264hi10p) ? DefaultHdrImageExtractionTimeout : DefaultSdrImageExtractionTimeout;
+                        timeoutMs = enableHdrExtraction ? DefaultHdrImageExtractionTimeout : DefaultSdrImageExtractionTimeout;
                     }
 
                     try
@@ -1247,7 +1257,8 @@ namespace MediaBrowser.MediaEncoding.Encoder
             }
 
             // Generate concat configuration entries for each file and write to file
-            using StreamWriter sw = new StreamWriter(concatFilePath);
+            Directory.CreateDirectory(Path.GetDirectoryName(concatFilePath));
+            using StreamWriter sw = new FormattingStreamWriter(concatFilePath, CultureInfo.InvariantCulture);
             foreach (var path in files)
             {
                 var mediaInfoResult = GetMediaInfo(
@@ -1266,7 +1277,7 @@ namespace MediaBrowser.MediaEncoding.Encoder
                 var duration = TimeSpan.FromTicks(mediaInfoResult.RunTimeTicks.Value).TotalSeconds;
 
                 // Add file path stanza to concat configuration
-                sw.WriteLine("file '{0}'", path);
+                sw.WriteLine("file '{0}'", path.Replace("'", @"'\''", StringComparison.Ordinal));
 
                 // Add duration stanza to concat configuration
                 sw.WriteLine("duration {0}", duration);
